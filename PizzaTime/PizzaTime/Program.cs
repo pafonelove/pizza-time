@@ -25,13 +25,24 @@
 
 
 using System;
+using System.Diagnostics;
 using System.Xml.Linq;
 
 namespace PizzaTime
 {
-    class Pizza                                                                     // класс для генерации сущности типа Пицца
+    // Класс для создания сущностей Pizza.
+    class Pizza                                                                   
     {
         string? name = "Undefined";
+
+        // Конструктор для создания экземпляров Pizza.
+        public Pizza(string? n)
+        {
+            if ((n is null) || (n == ""))
+                throw new ArgumentNullException("Name must not be empty!");
+            name = n;
+        }
+
         public string Name
         {
             set
@@ -46,9 +57,18 @@ namespace PizzaTime
         }
     }
 
-    class Pizzeria                                                                  // класс для взаимодействия с сущностями типа Пиццерия и Клиент
+    // Класс для создания сущностей Pizzeria.
+    class Pizzeria    
     {
         string? name = "Undefined";
+
+        // Конструктор для создания экземпляров Pizzeria.
+        public Pizzeria(string? n)
+        {
+            if ((n is null) || (n == ""))
+                throw new ArgumentNullException("Name must not be empty!");
+            name = n;
+        }
         public string Name
         {
             set
@@ -62,16 +82,8 @@ namespace PizzaTime
             }
         }
 
-        public void SetPizzaName(Pizza p1, Pizza p2, Pizza p3, Pizza p4, Pizza p5)   // запись названий видов пиццы в экземпляры класса Pizza
-        {
-            p1.Name = "Original Margherita";
-            p2.Name = "Our White Pizza (no tomato sauce)";
-            p3.Name = "Rustic Double Pepperoni";
-            p4.Name = "Sausage, Peppers and Onion";
-            p5.Name = "Pesto Pie";
-        }
-
-        public void GetPizzaName(Pizza p1, Pizza p2, Pizza p3, Pizza p4, Pizza p5)   // получение названия вида пиццы
+        // Метож отображения названий пицц.
+        public void GetPizzaName(Pizza p1, Pizza p2, Pizza p3, Pizza p4, Pizza p5)
         {
             Console.WriteLine($"1. {p1.Name}");
             Console.WriteLine($"2. {p2.Name}");
@@ -80,13 +92,15 @@ namespace PizzaTime
             Console.WriteLine($"5. {p5.Name}");
         }
 
-        public void CookPizza()                                                      // уведомление о приготовлении выбранной пицы
+        // Метод отображения сообщения о приготовлении выбранной пиццы.
+        public void CookPizza()
         {
             Console.WriteLine("Your pizza is getting ready. Please wait a while.\n\n");
             LoadScreen();
         }
 
-        public void LoadScreen()                                                     // имитация экрана процесса приготовления пиццы
+        // Метод имитации экрана загрузки.
+        public void LoadScreen() 
         {
             Console.Write("L O A D I N G ");
             for (int i = 0; i < 20; i++)
@@ -97,18 +111,26 @@ namespace PizzaTime
             Console.Clear();
         }
 
-        public void GivePizza(Consumer cnsmr)                                        // отдать пиццу клиенту
+        // Метод отображения сообщения о выдаче готовой пиццы.
+        public void GivePizza(Consumer cnsmr) 
         {
             Console.Clear();
             Console.WriteLine($"{cnsmr.Name}! Your pizza is ready! Bon appetit.");
         }
     }
 
-    
-
-    class Consumer                                                                  // класс для взаимодействия с сущностями типа клиент
+    // Класс для создания сущностей Consumer.
+    class Consumer 
     {
         string? name = "Undefined";
+
+        // Конструктор для создания экземпляров Consumer.
+        public Consumer(string? n)
+        {
+            if ((n is null) || (n == ""))
+                throw new NullReferenceException("Name must not be empty!");
+            name = n;
+        }
         public string Name
         {
             set
@@ -122,13 +144,15 @@ namespace PizzaTime
             }
         }
 
-        public void Actions()                                                       // действия, которые может выполнять клиент
+        // Метод отображения действий, которые может выполнять экземпляр Consumer;
+        public void Actions()                                                      
         {
             Console.WriteLine("1. Buy pizza.\n" +
                               "2. Exit from pizzeria.");
         }
 
-        public void TakePizza()                                                     // забрать пиццу после приготовления
+        // Метод действия - забрать пиццу после приготовления.
+        public void TakePizza()
         {
             Console.WriteLine("\n*you took a pizza and went to the car*");
         }
@@ -136,110 +160,148 @@ namespace PizzaTime
 
     class Program
     {
+        static string? input;
+        static bool flag = false;
+
+        static Pizza p1;
+        static Pizza p2;
+        static Pizza p3;
+        static Pizza p4;
+        static Pizza p5;
+        
+        static Pizzeria pzzr;
+        static Consumer cnsmr;
+
         static void Main()
         {
-            // Входные данные.
-            string? input;
-
-            Pizza p1 = new();
-            Pizza p2 = new();
-            Pizza p3 = new();
-            Pizza p4 = new();
-            Pizza p5 = new();
-
-            Pizzeria pzzr = new();
-            Console.Write("Enter the pizzeria's name: ");
-            pzzr.Name = Console.ReadLine();
-
-            Consumer cnsmr = new();
-            Console.Write("Enter the consumer's name: ");
-            cnsmr.Name = Console.ReadLine();
-
-            bool flag = false;
+            MakePizzaObj();
+            MakePizzeriaObj();
+            MakeConsumerObj();
+            
             while(true)                                                             // запуск бесконечного цикла (выход осуществляется по заданному условию) - начало
                                                                                     // работы алгоритма заказа пиццы
             {
                 Console.Clear();
 
-                Console.WriteLine($"Hi {cnsmr.Name}! What dou want?");
-                cnsmr.Actions();
-
-                Console.Write("> ");
-                input = Console.ReadLine();
-                while (!flag)
-                {
-                    switch (input)
-                    {
-                        case "1":
-                            Console.WriteLine();
-                            flag = true;
-                            break;
-
-                        case "2":
-                            Console.WriteLine("Exit...");
-                            return;
-
-                        default:
-                            Console.WriteLine("Choose correctly action!");
-                            break;
-                    }
-                }
+                ConsActions();
                 flag = false;
 
+                ChoosePizzaCons();
 
-                // Выбор пиццы клиентом.
-                Console.WriteLine("Which pizza do you want to buy?");
-                pzzr.SetPizzaName(p1, p2, p3, p4, p5);
-                pzzr.GetPizzaName(p1, p2, p3, p4, p5);
-                Console.WriteLine();
-
-                Console.Write("> ");
-                input = Console.ReadLine();
-                while (!flag)
-                {
-                    switch (input)
-                    {
-                        case "1":
-                            Console.WriteLine($"\nYou chosen {p1.Name}");
-                            flag = true;
-                            break;
-
-                        case "2":
-                            Console.WriteLine($"\nYou chosen {p2.Name}"); ;
-                            flag = true;
-                            break;
-
-                        case "3":
-                            Console.WriteLine($"\nYou chosen {p3.Name}");
-                            flag = true;
-                            break;
-
-                        case "4":
-                            Console.WriteLine($"\nYou chosen {p4.Name}");
-                            flag = true;
-                            break;
-
-                        case "5":
-                            Console.WriteLine($"\nYou chosen {p5.Name}");
-                            flag = true;
-                            break;
-
-                        default:
-                            Console.WriteLine("Choose correctly pizza!");
-                            Console.Write("> ");
-                            input = Console.ReadLine();
-                            break;
-                    }
-                }
-
-                // Уведомление о приготовлении пиццы и отображение имени клиента на дисплее.
-                pzzr.CookPizza();
-                pzzr.GivePizza(cnsmr);
-
-                cnsmr.TakePizza();
+                Notifitaction();
 
                 return;
             }
+        }
+
+        // Метод создания новых экземпляров класса Pizza.
+        static void MakePizzaObj()
+        {
+            p1 = new("Original Margherita");
+            p2 = new("Our White Pizza (no tomato sauce)");
+            p3 = new("Rustic Double Pepperoni");
+            p4 = new("Sausage, Peppers and Onion");
+            p5 = new("Pesto Pie");
+        }
+
+        // Метод создания новых экземпляров класса Pizzeria.
+        static void MakePizzeriaObj()
+        {
+            Console.Write("Enter the pizzeria's name: ");
+            input = Console.ReadLine();
+            pzzr = new(input);
+        }
+
+        // Метод создания новых экземпляров класса Consumer.
+        static void MakeConsumerObj()
+        {
+            Console.Write("Enter the consumer's name: ");
+            input = Console.ReadLine();
+            cnsmr = new(input);
+        }
+
+        // Метод вызова действий экземпляра Consumer.
+        static void ConsActions()
+        {
+            Console.WriteLine($"Hi {cnsmr.Name}! What do you want?");
+            cnsmr.Actions();
+
+            Console.Write("> ");
+            input = Console.ReadLine();
+            while (!flag)
+            {
+                switch (input)
+                {
+                    case "1":
+                        Console.WriteLine();
+                        flag = true;
+                        break;
+
+                    case "2":
+                        Console.WriteLine("Exit...");
+                        return;
+
+                    default:
+                        Console.WriteLine("Choose correctly action!");
+                        break;
+                }
+            }
+        }
+
+        // Вызов метода выбора пиццы эзкемпляром Consumer.
+        static void ChoosePizzaCons()
+        {
+            Console.WriteLine("Which pizza do you want to buy?");
+            pzzr.GetPizzaName(p1, p2, p3, p4, p5);
+            Console.WriteLine();
+
+            Console.Write("> ");
+            input = Console.ReadLine();
+            while (!flag)
+            {
+                switch (input)
+                {
+                    case "1":
+                        Console.WriteLine($"\nYou chosen {p1.Name}");
+                        flag = true;
+                        break;
+
+                    case "2":
+                        Console.WriteLine($"\nYou chosen {p2.Name}"); ;
+                        flag = true;
+                        break;
+
+                    case "3":
+                        Console.WriteLine($"\nYou chosen {p3.Name}");
+                        flag = true;
+                        break;
+
+                    case "4":
+                        Console.WriteLine($"\nYou chosen {p4.Name}");
+                        flag = true;
+                        break;
+
+                    case "5":
+                        Console.WriteLine($"\nYou chosen {p5.Name}");
+                        flag = true;
+                        break;
+
+                    default:
+                        Console.WriteLine("Choose correctly pizza!");
+                        Console.Write("> ");
+                        input = Console.ReadLine();
+                        break;
+                }
+            }
+        }
+
+        // Метод активации уведомления о приготовлении пиццы и отображения имени клиента на дисплее.
+        static void Notifitaction()
+        {
+            pzzr.CookPizza();
+            pzzr.GivePizza(cnsmr);
+
+            cnsmr.TakePizza();
         }
     }
 }
